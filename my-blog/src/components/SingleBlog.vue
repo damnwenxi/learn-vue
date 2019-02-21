@@ -1,8 +1,10 @@
 <template>
-	<div class="single-blog">
+	<div v-theme="'wide'" class="single-blog">
 		<div class="item">
 	      <h2>{{blog.title}}</h2>
-	      <article>{{blog.body}}</article>
+	      <article>{{blog.content}}</article>
+		  <p>作者：{{blog.author}}</p>
+		  <p>分类：{{blog.categories}}</p>
 	    </div>
 	</div>
 </template>
@@ -17,8 +19,10 @@
 			}
 		},
 		created(){
-			this.$http.get("https://jsonplaceholder.typicode.com/posts/"+this.id).then(function(data){
+			this.$http.get("https://wd8587891064eqnnsv.wilddogio.com/posts/"+this.id+".json").then(function(data){
 
+				// this.blog = data.body;
+				// console.log(data);
 				this.blog = data.body;
 			})
 		}
@@ -32,6 +36,10 @@
     background-color: #ddd;
     margin-top: 10px;
   }
+
+.single-blog{
+	margin: 10px auto;
+}
 
 	
 </style>

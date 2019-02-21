@@ -4,11 +4,11 @@
 
     <input class="search" type="text" v-model="search" placeholder="搜索">
 
-    <div class="item" v-for="blog in filterBlogs">
+    <div class="item" v-for="blog in filterBlogs" :key="blog.id">
       <router-link v-bind:to="'/blog/'+blog.id">
         <h2 v-rainbow>{{blog.title | snippet}}</h2>
       </router-link>
-      <article>{{blog.body}}</article>
+      <article>{{blog.content}}</article>
     </div>
 
   </div>
@@ -39,10 +39,18 @@ export default {
   },
 
   created(){
-    this.$http.get("https://jsonplaceholder.typicode.com/posts")
+    this.$http.get("https://wd8587891064eqnnsv.wilddogio.com/posts.json")
       .then(function(data){
-        this.blogs=data.body.slice(0,10);
-        console.log(this.blogs)
+        //this.blogs=data.body.slice(0,10);
+        // console.log(data.json());
+        return data.json();
+      }).then(function(data){
+        for(let key in data){
+          // console.log(key);
+          data[key].id = key;
+          this.blogs.push(data[key]);
+          // console.log(data[key]);
+        }
       })
   },
   // 自定义过滤器
@@ -88,8 +96,5 @@ export default {
     text-decoration: none;
   }
 
-  .item a:havor{
-
-  }
 
 </style>
