@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>vue组件通信</title>
+    <script src="../vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <father>
+        </father>
+    </div>
+    <!-- javascript脚本 -->
+    <script>
+Vue.component('father', {
+    data: function () {
+        return {
+            name: 'father',
+            age: 23
+        }
+    },
+    template: `<div>{{name}}<son @tips = "fn1" :age="age"></son></div>`,
+    methods: {
+        fn1: function (a) {
+            console.log(a);
+            alert("收到子组件的请求");
+        }
+    }
+});
+
+Vue.component('son', {
+    props: ['age'],
+    data: function () {
+        return {
+            name: 'son'
+        }
+    },
+    template: `<h2>{{name}}年龄:{{age}} <button @click="$emit('tips',123)">点击我触发父组件方法</button> </h2>`
+});
+
+let vm = new Vue({
+    el: '#app'
+});
+
+    </script>
+</body>
+
+</html>
