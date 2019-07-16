@@ -1,9 +1,14 @@
 <template>
   <div id="app">
-    <m-header></m-header>
-    <tab></tab>
+    <div class="top">
+      <m-header></m-header>
+      <tab></tab>
+    </div>
+    <div class="clear-fixed"></div>
     <keep-alive>
-      <router-view></router-view>
+      <router-view>
+        <div class="bottom-space"></div>
+      </router-view>
     </keep-alive>
     <player></player>
   </div>
@@ -30,10 +35,10 @@ body {
   width: 100%;
   height: 100%;
   background-color: $background-color;
-  box-sizing: border-box;
 }
 
 * {
+  box-sizing: border-box;
   padding: 0;
   margin: 0;
 }
@@ -47,6 +52,17 @@ body {
   outline: none;
 }
 
+.top {
+  z-index: 10;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  background-color: $background-color;
+}
+
+.clear-fixed {
+  height: 84px;
+}
 a {
   text-decoration: none;
   color: $font-color;
@@ -54,5 +70,9 @@ a {
 
 li {
   list-style: none;
+}
+
+.bottom-space {
+  height: 60px;
 }
 </style>

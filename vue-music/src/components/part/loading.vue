@@ -1,11 +1,11 @@
 <template>
-  <div v-if="false" class="loading">
+  <div class="loading">
     <img src="../../assets/images/loading.gif" alt="loading" />
     <p class="desc">{{title}}</p>
   </div>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
 export default {
   props: {
     title: {
@@ -20,7 +20,6 @@ export default {
 @import "../../assets/css/base.scss";
 
 .loading {
-  margin: 1em;
   width: 100%;
   text-align: center;
   img {

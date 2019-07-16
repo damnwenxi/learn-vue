@@ -1,9 +1,20 @@
 <template>
-  <div id="singer">singer</div>
+  <div id="singer">
+    <singer-list></singer-list>
+    <slot></slot>
+  </div>
 </template>
 
 <script>
-export default {};
+import singerList from "../components/part/singer-list";
+export default {
+  data() {
+    return {};
+  },
+  components: {
+    singerList
+  }
+};
 </script>
 
 <style lang="scss" scoped>

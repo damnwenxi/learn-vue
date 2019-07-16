@@ -1,6 +1,8 @@
 <template>
   <div id="recommend">
-    <loading v-if="!items.length" title="自定义标题"></loading>
+    <!-- 轮播图 -->
+    <slider :imgList="sliders"></slider>
+
     <div class="recommend-list">
       <h1 class="recommend-title">热门歌单推荐</h1>
       <ul>
@@ -15,33 +17,52 @@
         </li>
       </ul>
     </div>
+
+    <!-- loading -->
+    <loading v-show="!items.length"></loading>
   </div>
 </template>
 
-<script>
+<script type="text/ecmascript-6">
 import loading from "../components/part/loading";
+import slider from "../components/slider";
+import { getRecommend, getDiscList } from "../api/recommend";
 export default {
   components: {
-    loading
+    loading,
+    slider
   },
   data() {
     return {
-      items: {}
+      items: [],
+      sliders: []
     };
   },
   created() {
-    this._getItems();
+    this._getRecommend();
+    // this._getDiscList();
   },
   methods: {
-    _getItems() {
-      fetch("http://kkboom.cn:9876/images?num=0")
+    // 轮播图图片接口
+    _getRecommend() {
+      getRecommend()
         .then(res => {
-          return res.json();
+          this.sliders = res.data.slider;
         })
-        .then(body => {
-          this.items = body.img_list;
+        .catch(e => {
+          console.log(e);
         });
     }
+    // qq音乐歌单接口
+    // _getDiscList() {
+    //   getDiscList()
+    //     .then(res => {
+    //       console.log(res);
+    //     })
+    //     .catch(err => {
+    //       console.log(err);
+    //     });
+    // }
   }
 };
 </script>
@@ -50,6 +71,8 @@ export default {
 @import "../assets/css/base.scss";
 #recommend {
   width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
   .recommend-title {
     font-size: $font-size-h;
     color: $theme-color;

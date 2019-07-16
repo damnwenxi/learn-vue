@@ -22,6 +22,7 @@ export default {};
 <style lang="scss" scoped>
 @import "../assets/css/base.scss";
 #tab {
+  width: 100%;
   display: flex;
   height: 44px;
   line-height: 44px;
