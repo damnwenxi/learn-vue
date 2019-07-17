@@ -4,6 +4,7 @@ import rank from './views/rank'
 import recommend from './views/recommend'
 import singer from './views/singer'
 import search from './views/search'
+import singerDetail from './views/singerDetail'
 
 
 
@@ -28,6 +29,10 @@ export default new Router({
       component: singer
       // lazy load router
       // component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
+    },
+    {
+      path: '/singer/:id',
+      component: singerDetail
     },
     {
       path: '/search',

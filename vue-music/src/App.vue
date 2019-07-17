@@ -5,7 +5,7 @@
       <tab></tab>
     </div>
     <div class="clear-fixed"></div>
-    <keep-alive>
+    <keep-alive :include="aliveComponents">
       <router-view>
         <div class="bottom-space"></div>
       </router-view>
@@ -23,6 +23,11 @@ export default {
     mHeader,
     tab,
     player
+  },
+  computed: {
+    aliveComponents() {
+      return ["recommend", "singer", "rank", "search"];
+    }
   }
 };
 </script>
@@ -41,15 +46,16 @@ body {
   box-sizing: border-box;
   padding: 0;
   margin: 0;
+  outline: none;
 }
 
 #app {
+  height: 100%;
   font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: $font-color;
-  outline: none;
 }
 
 .top {

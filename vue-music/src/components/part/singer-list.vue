@@ -4,7 +4,12 @@
       <li class="list-group" v-for="singers in singerGroup" :key="singers.title">
         <h1 :id="singers.title" class="list-group-title">{{singers.title}}</h1>
         <ul>
-          <li class="list-group-item" v-for="singer in singers.items" :key="singer.id">
+          <li
+            @click="selectItem(singer)"
+            class="list-group-item"
+            v-for="singer in singers.items"
+            :key="singer.id"
+          >
             <img v-lazy="singer.avatar" :alt="singer.name" />
             <p>{{singer.name}}</p>
           </li>
@@ -21,7 +26,7 @@
 <script>
 import { getSingerList } from "../../api/singer";
 import { ERR_OK } from "../../api/config";
-import Signer from "../../api/common";
+import Signer from "../../api/singer";
 import shortList from "./list-shortcut";
 const HOT_NAME = "热门";
 const HOT_NUM = 10;
@@ -99,6 +104,9 @@ export default {
     handleMove(e) {
       let target = e.target;
       console.log(target);
+    },
+    selectItem(singer) {
+      this.$emit("select", singer);
     }
   }
 };
@@ -141,6 +149,7 @@ export default {
 }
 
 .singer-list {
+  height: 100%;
   .list-shortcut {
     position: fixed;
     right: 0;

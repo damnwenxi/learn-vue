@@ -28,6 +28,7 @@ import loading from "../components/part/loading";
 import slider from "../components/slider";
 import { getRecommend, getDiscList } from "../api/recommend";
 export default {
+  name: "recommend",
   components: {
     loading,
     slider
