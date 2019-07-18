@@ -1,0 +1,29 @@
+{
+  "name": "music",
+  "version": "1.0.0",
+  "description": "a web music  app",
+  "main": "music.js",
+  "scripts": {
+    "start": "nodemon music.js",
+    "dev": "node music.js"
+  },
+  "keywords": [
+    "music",
+    "李志",
+    "node",
+    "vue"
+  ],
+  "author": "1396956549@qq.com",
+  "license": "ISC",
+  "devDependencies": {
+    "co-mysql": "^1.0.0",
+    "koa": "^2.7.0",
+    "koa-body": "^4.1.0",
+    "koa-router": "^7.4.0",
+    "koa-static": "^5.0.0",
+    "mysql": "^2.17.1"
+  },
+  "dependencies": {
+    "uuid": "^3.3.2"
+  }
+}
