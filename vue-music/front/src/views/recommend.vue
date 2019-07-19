@@ -72,7 +72,6 @@ export default {
 @import "../assets/css/base.scss";
 #recommend {
   width: 100%;
-  max-width: 800px;
   margin: 0 auto;
   .recommend-title {
     font-size: $font-size-h;

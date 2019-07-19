@@ -57,6 +57,9 @@ body {
   text-align: center;
   color: $font-color;
 }
+i {
+  font-size: 25px;
+}
 
 .top {
   z-index: 10;

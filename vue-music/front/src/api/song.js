@@ -1,9 +1,10 @@
 import jsonp from './jsonp'
-import { songUrlParams, options, songUrlData } from './config'
+import { songUrlParams, options, songUrlData, PURL_SERVER } from './config'
 
 
 export default class Song {
-    constructor({ id, mid, singer, name, album, duration, image, url }) {
+    constructor({ ispay, id, mid, singer, name, album, duration, image, url }) {
+        this.ispay = ispay
         this.id = id
         this.mid = mid
         this.singer = singer
@@ -22,9 +23,22 @@ export function getSongUrl() {
     return jsonp(url, data, options)
 }
 
+export function getPlayUrl(mid) {
+    const promise = new Promise((resolve, reject) => {
+        fetch(PURL_SERVER + '/qqmusic?id=' + mid).then(body => {
+            return body.json()
+        }).then(res => {
+            resolve(res);
+        }).catch(e => {
+            reject(e)
+        })
+    })
+    return promise
+}
 
 export function createSong(musicData) {
     return new Song({
+        ispay: musicData.pay.payplay,
         id: musicData.songid,
         mid: musicData.songmid,
         singer: filterSinger(musicData.singer),

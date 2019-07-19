@@ -29,3 +29,5 @@ export const songUrlParams = {
 export const songUrlData = {
     data: '{"req_0":{"module":"vkey.GetVkeyServer","method":"CgiGetVkey","param":{"guid":"110633334","songmid":["003Cwaex3Q7Hz2"],"songtype":[0],"uin":"1396956549","loginflag":1,"platform":"20"}},"comm":{"uin":1396956549,"format":"json","ct":24,"cv":0}}'
 }
+
+export const PURL_SERVER = 'http://118.25.210.208:9999'

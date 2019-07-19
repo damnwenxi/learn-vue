@@ -1,9 +1,15 @@
 <template>
   <div class="song-list">
     <ul ref="songlist">
-      <li v-for="song in songs" :key="song.id" class="song-item">
+      <li
+        v-for="(song,index) in songs"
+        @click="selectSong(song,index)"
+        :key="song.id"
+        class="song-item"
+      >
         <h2 class="song-title">{{song.name}}</h2>
         <p class="song-desc">{{song.album}}</p>
+        <span class="ispay" v-show="song.ispay">付费歌曲</span>
       </li>
     </ul>
   </div>
@@ -22,6 +28,15 @@ export default {
   },
   created() {
     // console.log(this.songs);
+  },
+  methods: {
+    selectSong(song, index) {
+      if (song.ispay) {
+        alert("付费歌曲，无法播放");
+        return;
+      }
+      this.$emit("select", song, index);
+    }
   }
 };
 </script>
@@ -31,6 +46,7 @@ export default {
 .song-list {
   width: 100%;
   .song-item {
+    position: relative;
     text-align: left;
     width: 100%;
     padding: 5px 1.4em;
@@ -46,6 +62,17 @@ export default {
     .song-desc {
       font-size: $font-size-middle;
       color: #aaa;
+    }
+    .ispay {
+      height: 20px;
+      right: 2.4em;
+      top: calc(50% - 10px);
+      position: absolute;
+      font-size: 10px;
+      color: $theme-color;
+      border: 1px solid $theme-color;
+      border-radius: 5px;
+      padding: 0 3px;
     }
   }
 }

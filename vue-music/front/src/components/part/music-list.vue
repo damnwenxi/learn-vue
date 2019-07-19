@@ -4,7 +4,9 @@
 
     <div class="img-back" @click="resetWraper">
       <h1 class="title" v-html="title"></h1>
-      <p class="back" @click="back">《</p>
+      <p class="back" @click="back">
+        <i style="font-size:30px" class="iconfont icon-fanhui-yuanshijituantubiao"></i>
+      </p>
       <div class="play-btn">
         <button>随机播放</button>
       </div>
@@ -14,7 +16,7 @@
       <div class="loading-wraper" v-if="songs.length===0">
         <loading></loading>
       </div>
-      <song-list :songs="songs"></song-list>
+      <song-list @select="selectSong" :songs="songs"></song-list>
     </div>
   </div>
 </template>
@@ -22,6 +24,8 @@
 <script>
 import songList from "./song-list";
 import loading from "./loading";
+import { mapActions } from "vuex";
+
 export default {
   components: { songList, loading },
   data() {
@@ -65,7 +69,14 @@ export default {
     },
     resetWraper() {
       this.isScrollTop = false;
-    }
+    },
+    selectSong(song, index) {
+      this.selectPlay({
+        list: this.songs,
+        index: index
+      });
+    },
+    ...mapActions(["selectPlay"])
   }
 };
 </script>
