@@ -44,7 +44,7 @@ export default {
       }
     },
     play() {
-      setInterval(this.autoPlay, 2000);
+      setInterval(this.autoPlay, 5000);
     }
   },
   mounted() {

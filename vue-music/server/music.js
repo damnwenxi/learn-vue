@@ -30,17 +30,13 @@ app.use(router.routes()).use(router.allowedMethods());
  * 测试接口
  */
 router.get('/', async ctx => {
-    const findTest = await ctx.db.query(
-        "select * from songs"
-    );
-    console.log(findTest);
     ctx.body = { msg: "success" };
 })
 
 
 /**
- * @desc file upload api
- * @port /api/upload/, public
+ * @desc song upload api
+ * @port /upload/, public
  * @param ...
  */
 router.post('/upload', async ctx => {
@@ -56,103 +52,77 @@ router.post('/upload', async ctx => {
         let picurl = ''
         if (picture.size > 0 && picture.size < 5242880) {
             const newFileName = await saveFile(picture, config.MUSIC_PIC)
-            if (newFileName) {
-                picurl = config.PIC_SERVER_NAME + newFileName
-            }
-            // // 创建可读流
-            // const rs = fs.createReadStream(picture.path);
-            // // 重命名(uuid)
-            // const type = picture.name.split('.').pop()
-            // const newFileName = uuidv1() + '.' + type;
-            // // 创建可写流
-            // const ws = fs.createWriteStream(config.MUSIC_PIC + newFileName);
-            // // 管道链接传输并获取地址
-            // const file_path = await rs.pipe(ws).path
-            // if (file_path) {
-            //     picurl = config.PIC_SERVER_NAME + newFileName;
-            // }
-
+            picurl = newFileName ? (config.PIC_SERVER_NAME + newFileName) : config.DEFAULT_PIC
         } else {
             picurl = config.DEFAULT_PIC
         }
-        console.log(picurl);
-        return
         // 判断歌曲大小
         if (song.size > 0 && song.size < 52428800) {
             const title = data.title || song.name
             const mid = uuidv1()
             const singer = data.singer || '未知歌手'
             const album = data.album || '未知专辑'
+            const size = song.size
+            const text = data.text || '暂无歌词'
 
-            // 创建可读流
-            const rs = fs.createReadStream(song.path);
-            // 重命名(uuid)
-            const type = song.name.split('.').pop()
-            const newFileName = uuidv1() + '.' + type
-            // 创建可写流
-            const ws = fs.createWriteStream(config.MUSIC_PATH + newFileName);
-            // 管道链接传输并获取地址
-            const pic_path = await rs.pipe(ws).path
-            if (pic_path) {
-                const picurl = config.MUSIC_SERVER_NAME + newFileName
-            }
+            const newFileName = await saveFile(song, config.MUSIC_PATH)
+            const purl = newFileName ? (config.MUSIC_SERVER_NAME + newFileName) : ''
             // 整理要写入到数据库的数据
-            const item = [title, uuidv1(), data.singer];
-            const url = 'http://' + ctx.header.host + '/' + newFileName;
-            // console.log(url);
-            item.push(url);
+            const item = [title, mid, singer, album, size, picurl, purl, text];
 
             // 存储相关信息到数据库
-            const savaFile = await ctx.db.query(
-                "insert into file set fileName=?,size=?,description=?,url=?,passtime=date_add(NOW(), interval 30 minute)",
+            const savaSong = await ctx.db.query(
+                "insert into songs set title=?,mid=?,singer=?,album=?,msize=?,picurl=?,purl=?,mtext=?",
                 item
             );
 
-            if (savaFile.affectedRows > 0) {
+            if (savaSong.affectedRows > 0) {
                 ctx.status = 200;
-                ctx.body = { msg: '上传文件成功。', savaFile };
+                ctx.body = { msg: '歌曲文件上传成功' };
             } else {
-                ctx.status = 500;
-                ctx.body = { msg: '上传文件失败，请稍后再试。' };
+                ctx.status = 200;
+                ctx.body = { msg: '上传歌曲文件失败，请稍后再试' };
             }
         } else {
-            ctx.status = 400;
-            ctx.body = { msg: '文件大于50M或格式有误。' };
+            ctx.status = 200;
+            ctx.body = { msg: '歌曲文件大于50M或格式有误' };
         }
     } catch (e) {
-        throw e;
+        console.log(e)
+        ctx.status = 500;
+        ctx.body = { msg: 'server error' }
     }
 });
 
 
 /**
- * @desc get filelist api
- * @port /api/filelist/, public
+ * @desc get songlist api
+ * @port /songlist, public
  * @param page
  */
-router.get('/filelist', async ctx => {
+router.get('/songlist', async ctx => {
     try {
-        const page = parseInt(ctx.query.page);
-        // page合法
-        if (page >= 0) {
-            const fileList = await ctx.db.query(
-                "select * from file where showable=1 order by c_date desc limit ?,10 ",
-                page * 10
+        const num = parseInt(ctx.query.num) || 100;
+        const singer = ctx.query.singer.toString()
+        // num合法
+        let re = /^[\u4e00-\u9fa5a-zA-Z0-9]+$/gi
+        if (num >= 0 && re.test(singer)) {
+            const songlist = await ctx.db.query(
+                "select * from songs where singer=? order by add_date desc limit ?",
+                [singer, num]
             );
-            const count = await ctx.db.query(
-                'select count(*) from file'
-            );
-            if (fileList.length > 0) {
+            if (songlist.length > 0) {
                 ctx.status = 200;
-                ctx.body = { msg: 'success', fileList, page, count };
+                ctx.body = { msg: 'success', songlist };
             }
         } else {
-            ctx.status = 400;
-            ctx.body = { msg: 'params err' };
+            ctx.status = 200;
+            ctx.body = { msg: '参数不合法' };
         }
     } catch (e) {
+        console.log(e);
         ctx.status = 500;
-        ctx.body = { msg: 'err' };
+        ctx.body = { msg: 'server error' };
     }
 })
 
@@ -204,20 +174,28 @@ router.get('/del', async ctx => {
  */
 router.get('/find', async ctx => {
     try {
-        const keywords = ctx.query.keywords;
-        const findResult = await ctx.db.query(
-            'select * from file where fileName like ? or description like ? order by c_date desc',
-            ['%' + keywords + '%', '%' + keywords + '%']
-        );
-        if (findResult.length > 0) {
-            ctx.status = 200;
-            ctx.body = { msg: 'success', findResult };
+        const keywords = ctx.query.k;
+        let re = /^[\u4e00-\u9fa5a-zA-Z0-9]+$/gi
+        if (re.test(keywords)) {
+            const findResult = await ctx.db.query(
+                'select * from songs where title like ? or singer like ? order by add_date desc',
+                ['%' + keywords + '%', '%' + keywords + '%']
+            );
+            if (findResult.length > 0) {
+                ctx.status = 200;
+                ctx.body = { msg: 'success', findResult };
+            } else {
+                ctx.status = 200;
+                ctx.body = { msg: '没有搜索结果' };
+            }
         } else {
-            ctx.status = 200;
-            ctx.body = { msg: 'can not find.' };
+            ctx.status = 400;
+            ctx.body = { msg: '参数不合法' };
         }
+
     } catch (e) {
-        throw e;
+        ctx.status = 500;
+        ctx.body = { msg: 'server error' };
     }
 })
 

@@ -20,6 +20,8 @@
               </div>
             </div>
           </div>
+
+          <progress-bar :duration="duration" :currentTime="currentTime"></progress-bar>
         </div>
         <div class="bottom">
           <div class="operators">
@@ -28,16 +30,18 @@
             </div>
             <div class="icon i-left">
               <i
+                :class="disable"
                 style="font-size:30px"
                 @click="switchSong(-1)"
                 class="iconfont icon-shangyishou-yuanshijituantubiao"
               ></i>
             </div>
             <div class="icon i-center">
-              <i style="font-size:40px" @click="playToggle" class="iconfont" :class="isPlayed"></i>
+              <i style="font-size:50px" @click="playToggle" class="iconfont" :class="isPlayed"></i>
             </div>
             <div class="icon i-right">
               <i
+                :class="disable"
                 style="font-size:30px"
                 @click="switchSong(1)"
                 class="iconfont icon-xiayishou-yuanshijituantubiao"
@@ -73,20 +77,42 @@
     </transition>
 
     <!-- 播放器 -->
-    <audio @ended="switchSong(1)" ref="audio" :src="playUrl"></audio>
+    <audio
+      @timeupdate="timeUpdate"
+      @canplay="canPlay"
+      @ended="switchSong(1)"
+      ref="audio"
+      :src="playUrl"
+    ></audio>
   </div>
 </template>
 
 <script>
 import { mapGetters, mapMutations } from "vuex";
 import { getPlayUrl } from "../api/song";
+import progressBar from "./part/progress-bar";
 export default {
+  components: {
+    progressBar
+  },
   data() {
     return {
-      playUrl: ""
+      playUrl: "",
+      canplay: false,
+      currentTime: 0,
+      duration: 0
     };
   },
   computed: {
+    progress() {
+      return ~~(this.currentTime / this.totalTime);
+    },
+    disable() {
+      if (!this.canplay) {
+        return "disable-btn";
+      }
+      return "";
+    },
     ...mapGetters([
       "isFullScreen",
       "playlist",
@@ -101,6 +127,16 @@ export default {
     }
   },
   methods: {
+    // canplay
+    canPlay(e) {
+      this.duration = ~~e.target.duration;
+      this.canplay = true;
+      this.play();
+    },
+    // timeupdate
+    timeUpdate(e) {
+      this.currentTime = ~~e.target.currentTime;
+    },
     // 切歌
     switchSong(n) {
       const len = this.playlist.length;
@@ -126,38 +162,37 @@ export default {
     // 获取播放链接
     _getPlayUrl() {
       const mid = this.currentSong.mid;
-      getPlayUrl(mid)
-        .then(res => {
-          if (!res.midurlinfo.purl) {
-            alert("付费歌曲，无法播放");
-            return;
-          }
-          this.playUrl = res.sip[0] + res.midurlinfo.purl;
-          this.$nextTick(() => {
-            this.setPlayingState(true);
-            this.$refs.audio.play();
-          });
-        })
-        .catch(e => {
-          console.log(e);
-        });
+      getPlayUrl(mid).then(res => {
+        this.playUrl = res.sip[0] + res.midurlinfo.purl;
+      });
+    },
+
+    // play
+    play() {
+      this.$nextTick(() => {
+        this.setPlayingState(true);
+        this.$refs.audio.play();
+      });
     }
   },
   watch: {
-    currentSong() {
+    currentSong(newSong) {
+      if (newSong.ispay) {
+        alert("付费歌曲，已为您切换到下一首");
+        this.switchSong(1);
+      }
       this._getPlayUrl();
     },
     isPlaying(newState) {
       const audio = this.$refs.audio;
       this.$nextTick(() => {
-        if (newState) {
+        if (newState && this.canplay) {
           audio.play();
         } else {
           audio.pause();
         }
       });
-    },
-    currentIndex(newIndex) {}
+    }
   }
 };
 </script>
@@ -183,7 +218,7 @@ export default {
       height: 100%;
       z-index: -1;
       opacity: 0.6;
-      filter: blur(20px);
+      filter: blur(30px);
     }
     .top {
       .back {
@@ -206,7 +241,11 @@ export default {
       }
     }
     .middle {
-      margin-top: 5em;
+      z-index: -1;
+      height: 100%;
+      position: relative;
+      padding: 5em 0;
+
       .cd {
         width: 300px;
         height: 300px;
@@ -221,10 +260,10 @@ export default {
       bottom: 1em;
       width: 100%;
       .operators {
-        padding: 2em;
+        padding: 0 2em 1.5em 2em;
         width: 100%;
         display: flex;
-        justify-content: space-around;
+        justify-content: space-between;
         .icon {
           font-size: 30px;
           text-align: center;
@@ -236,6 +275,9 @@ export default {
           &:hover {
             color: $theme-color;
             cursor: pointer;
+          }
+          .disable-btn {
+            color: rgba(255, 255, 255, 0.2);
           }
         }
       }
@@ -277,12 +319,12 @@ export default {
       opacity: 0;
     }
 
-    padding: 0 1em;
+    padding: 0 1.2em;
     display: flex;
     justify-content: space-between;
     align-items: center;
     .icon {
-      flex: 1;
+      margin-right: 1em;
       img {
         width: 40px;
         height: 40px;
@@ -291,7 +333,7 @@ export default {
       }
     }
     .text {
-      flex: 4;
+      flex: 1;
       text-align: left;
       .name {
         font-size: $font-size-middle;
@@ -303,7 +345,6 @@ export default {
       }
     }
     .control {
-      flex: 1;
     }
   }
 }
