@@ -15,13 +15,19 @@
         <div class="middle">
           <div class="middle-l">
             <div class="cd-wrapper">
-              <div class="cd">
+              <div class="cd" :class="isRotate">
                 <img class="image" :src="currentSong.image" />
               </div>
             </div>
           </div>
 
-          <progress-bar :duration="duration" :currentTime="currentTime"></progress-bar>
+          <loading v-if="!canplay"></loading>
+
+          <progress-bar
+            @progressChange="handleProgressChange"
+            :duration="duration"
+            :currentTime="currentTime"
+          ></progress-bar>
         </div>
         <div class="bottom">
           <div class="operators">
@@ -57,7 +63,7 @@
 
     <transition name="mini">
       <div class="mini-player" @click="setFullScreen" v-show="!isFullScreen">
-        <div class="icon">
+        <div class="icon" :class="isRotate">
           <img width="40" height="40" :src="currentSong.image" />
         </div>
         <div class="text">
@@ -91,16 +97,19 @@
 import { mapGetters, mapMutations } from "vuex";
 import { getPlayUrl } from "../api/song";
 import progressBar from "./part/progress-bar";
+import loading from "./part/loading";
 export default {
   components: {
-    progressBar
+    progressBar,
+    loading
   },
   data() {
     return {
       playUrl: "",
       canplay: false,
       currentTime: 0,
-      duration: 0
+      duration: 0,
+      isRotate: ""
     };
   },
   computed: {
@@ -127,6 +136,9 @@ export default {
     }
   },
   methods: {
+    handleProgressChange(progress) {
+      this.$refs.audio.currentTime = progress * this.$refs.audio.duration;
+    },
     // canplay
     canPlay(e) {
       this.duration = ~~e.target.duration;
@@ -139,6 +151,7 @@ export default {
     },
     // 切歌
     switchSong(n) {
+      this.isRotate = "rotate pause";
       const len = this.playlist.length;
       this.setCurrentIndex(this.currentIndex + n);
       if (this.currentIndex < 0 || this.currentIndex > len - 1) {
@@ -172,6 +185,7 @@ export default {
       this.$nextTick(() => {
         this.setPlayingState(true);
         this.$refs.audio.play();
+        this.isRotate = "rotate";
       });
     }
   },
@@ -188,8 +202,10 @@ export default {
       this.$nextTick(() => {
         if (newState && this.canplay) {
           audio.play();
+          this.isRotate = "rotate";
         } else {
           audio.pause();
+          this.isRotate = "rotate pause";
         }
       });
     }
@@ -252,7 +268,14 @@ export default {
         overflow: hidden;
         border-radius: 150px;
         margin: 1em auto;
-        border: 5px solid rgba(255, 255, 255, 0.2);
+        border: 5px solid rgba(255, 255, 255, 0.3);
+        box-shadow: 0 0 30px #777;
+      }
+      .rotate {
+        animation: 20s rotate linear infinite;
+      }
+      .pause {
+        animation-play-state: paused;
       }
     }
     .bottom {
@@ -318,6 +341,12 @@ export default {
     &.mini-leave-to {
       opacity: 0;
     }
+    .rotate {
+      animation: 20s rotate linear infinite;
+    }
+    .pause {
+      animation-play-state: paused;
+    }
 
     padding: 0 1.2em;
     display: flex;
@@ -345,6 +374,19 @@ export default {
       }
     }
     .control {
+    }
+  }
+
+  // animation
+  @keyframes rotate {
+    0% {
+      transform: rotate(0);
+    }
+    50% {
+      transform: rotate(180deg);
+    }
+    100% {
+      transform: rotate(360deg);
     }
   }
 }

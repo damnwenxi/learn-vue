@@ -19,6 +19,5 @@ function param(data) {
         let value = data[k] !== undefined ? data[k] : '';
         url += `&${k}=${encodeURIComponent(value)}`;
     }
-    console.log(url);
     return url ? url.substring(1) : '';
 }
