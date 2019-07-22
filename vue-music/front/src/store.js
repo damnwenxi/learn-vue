@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { shaffle } from './api/util'
 
 Vue.use(Vuex)
 
@@ -14,6 +15,11 @@ const playMode = {
   random: 2
 }
 
+function findIndex(list, song) {
+  return list.findIndex(item => {
+    return item.id === song.id
+  })
+}
 
 export default new Vuex.Store({
   state: {
@@ -50,10 +56,20 @@ export default new Vuex.Store({
   },
   actions: {
     // choose a song and play it
-    selectPlay({ commit }, { list, index }) {
+    selectPlay({ commit, state }, { list, index }) {
       commit('setSequenceList', list)
       commit('setPlayList', list)
       commit('setCurrentIndex', index)
+      commit('setFullScreen', true)
+      commit('setPlayingState', true)
+    },
+    // random play
+    randomPlay({ commit }, { list }) {
+      commit('setSequenceList', list)
+      commit('setMode', 2)
+      let randomList = shaffle(list)
+      commit('setPlayList', randomList)
+      commit('setCurrentIndex', 0)
       commit('setFullScreen', true)
       commit('setPlayingState', true)
     }

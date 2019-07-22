@@ -132,6 +132,7 @@ export default {
     img {
       width: 50px;
       height: 50px;
+      border-radius: 25px;
     }
     p {
       position: absolute;

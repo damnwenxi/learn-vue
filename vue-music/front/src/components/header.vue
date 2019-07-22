@@ -1,7 +1,9 @@
 <template>
   <div id="header">
     <h3>
-      <img src="../assets/images/logo.png" />Jay Chou
+      <img src="../assets/images/logo.png" />
+      <span>Music</span>
+      <span class="hub">hub</span>
     </h3>
   </div>
 </template>
@@ -16,21 +18,24 @@ export default {};
 #header {
   width: 100%;
   height: 40px;
-  line-height: 40px;
   h3 {
+    vertical-align: middle;
     font-weight: 600;
-    color: $theme-color;
+    color: white;
     margin: 0;
-    word-spacing: 0.5em;
-    letter-spacing: 5px;
     img {
-      margin-right: 1em;
       height: 40px;
       width: 40px;
     }
-    line-height: 40px;
     * {
       vertical-align: middle;
+    }
+    .hub {
+      padding: 0 5px;
+      margin-left: 5px;
+      background-color: $theme-color;
+      border-radius: 5px;
+      color: $background-color;
     }
   }
 }

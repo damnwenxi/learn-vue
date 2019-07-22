@@ -32,7 +32,7 @@ export default {
   methods: {
     selectSong(song, index) {
       if (song.ispay) {
-        alert("付费歌曲，无法播放");
+        console.log("付费歌曲，无法播放");
         return;
       }
       this.$emit("select", song, index);

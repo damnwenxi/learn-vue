@@ -32,7 +32,7 @@
         <div class="bottom">
           <div class="operators">
             <div class="icon i-left">
-              <i style="font-size:26px" class="iconfont icon-xunhuanbofang"></i>
+              <i style="font-size:24px" @click="switchMode" class="iconfont" :class="getModeStyle"></i>
             </div>
             <div class="icon i-left">
               <i
@@ -64,20 +64,22 @@
     <transition name="mini">
       <div class="mini-player" @click="setFullScreen" v-show="!isFullScreen">
         <div class="icon" :class="isRotate">
-          <img width="40" height="40" :src="currentSong.image" />
+          <img width="40" height="40" :src="currentSong.image || DEFAULT_IMG" />
         </div>
         <div class="text">
           <h2 class="name" v-html="currentSong.name"></h2>
           <p class="desc" v-html="currentSong.singer"></p>
         </div>
         <div class="control">
-          <i style="font-size:30px" @click.stop="playToggle" class="iconfont" :class="isPlayed"></i>
+          <i
+            style="font-size:30px;margin:0 1em"
+            @click.stop="playToggle"
+            class="iconfont"
+            :class="isPlayed"
+          ></i>
         </div>
         <div class="control">
-          <i
-            style="font-size:30px;line-height:60px"
-            class="iconfont icon-zhankai-yuanshijituantubiao"
-          ></i>
+          <i style="font-size:30px;line-height:60px" class="iconfont icon-liebiao"></i>
         </div>
       </div>
     </transition>
@@ -98,6 +100,7 @@ import { mapGetters, mapMutations } from "vuex";
 import { getPlayUrl } from "../api/song";
 import progressBar from "./part/progress-bar";
 import loading from "./part/loading";
+import { shaffle } from "../api/util";
 export default {
   components: {
     progressBar,
@@ -109,10 +112,23 @@ export default {
       canplay: false,
       currentTime: 0,
       duration: 0,
-      isRotate: ""
+      isRotate: "",
+      DEFAULT_IMG: require("../assets/images/logo.png")
     };
   },
   computed: {
+    getModeStyle() {
+      switch (this.mode) {
+        case 0:
+          return "icon-xunhuanbofang";
+        case 1:
+          return "icon-danquxunhuan";
+        case 2:
+          return "icon-suijibofang";
+        default:
+          return "icon-xunhuanbofang";
+      }
+    },
     progress() {
       return ~~(this.currentTime / this.totalTime);
     },
@@ -127,7 +143,9 @@ export default {
       "playlist",
       "currentSong",
       "isPlaying",
-      "currentIndex"
+      "currentIndex",
+      "mode",
+      "sequenceList"
     ]),
     isPlayed() {
       return this.isPlaying
@@ -136,6 +154,29 @@ export default {
     }
   },
   methods: {
+    // switch play mode
+    switchMode() {
+      this.setMode((this.mode + 1) % 3);
+      console.log(this.mode);
+
+      let list = [];
+      if (this.mode === 2) {
+        // 打乱数组
+        list = shaffle(this.playlist);
+      } else {
+        list = this.sequenceList;
+      }
+      this.resetCurrentSong;
+      this.setPlayList(list);
+    },
+
+    resetCurrentSong(list) {
+      let index = list.findIndex(item => {
+        return item.id === this.currentSong.id;
+      });
+      this.setCurrentIndex(index);
+    },
+
     handleProgressChange(progress) {
       this.$refs.audio.currentTime = progress * this.$refs.audio.duration;
     },
@@ -152,10 +193,16 @@ export default {
     // 切歌
     switchSong(n) {
       this.isRotate = "rotate pause";
+      this.setPlayingState(false);
       const len = this.playlist.length;
-      this.setCurrentIndex(this.currentIndex + n);
-      if (this.currentIndex < 0 || this.currentIndex > len - 1) {
-        this.setCurrentIndex(0);
+      // the playing mode is loop
+      if (this.mode === 1) {
+        this.$refs.audio.currentTime = 0;
+      } else {
+        this.setCurrentIndex(this.currentIndex + n);
+        if (this.currentIndex < 0 || this.currentIndex > len - 1) {
+          this.setCurrentIndex(0);
+        }
       }
     },
     // 播放暂停控制
@@ -171,7 +218,13 @@ export default {
     setFullScreen() {
       this.setFullScreen(true);
     },
-    ...mapMutations(["setFullScreen", "setPlayingState", "setCurrentIndex"]),
+    ...mapMutations([
+      "setFullScreen",
+      "setPlayingState",
+      "setCurrentIndex",
+      "setMode",
+      "setPlayList"
+    ]),
     // 获取播放链接
     _getPlayUrl() {
       const mid = this.currentSong.mid;
@@ -190,7 +243,10 @@ export default {
     }
   },
   watch: {
-    currentSong(newSong) {
+    currentSong(newSong, oldSong) {
+      if (newSong.id === oldSong.id) {
+        return;
+      }
       if (newSong.ispay) {
         alert("付费歌曲，已为您切换到下一首");
         this.switchSong(1);

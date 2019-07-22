@@ -8,7 +8,9 @@
         <i style="font-size:30px" class="iconfont icon-fanhui-yuanshijituantubiao"></i>
       </p>
       <div class="play-btn">
-        <button>随机播放</button>
+        <button @click="random">
+          <i class="iconfont icon-suijibofang"></i> 随机播放
+        </button>
       </div>
     </div>
 
@@ -59,6 +61,9 @@ export default {
     // console.log(this.songs);
   },
   methods: {
+    random() {
+      this.randomPlay({ list: this.songs });
+    },
     back() {
       this.$router.push({
         path: "/singer"
@@ -76,7 +81,7 @@ export default {
         index: index
       });
     },
-    ...mapActions(["selectPlay"])
+    ...mapActions(["selectPlay", "randomPlay"])
   }
 };
 </script>
@@ -126,19 +131,15 @@ export default {
       left: 0;
       right: 0;
       button {
+        border: 1px solid $theme-color;
+        vertical-align: middle;
         font-size: 16px;
         font-weight: 500;
-        color: white;
-        border: none;
         height: 30px;
-        background-color: rgba(0, 0, 0, 0.6);
+        color: $theme-color;
+        background-color: rgba(0, 0, 0, 0.3);
         border-radius: 15px;
-        line-height: 30px;
         padding: 0 20px;
-        &:hover {
-          color: $theme-color;
-          cursor: pointer;
-        }
       }
     }
   }
