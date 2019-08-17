@@ -40,7 +40,6 @@ export default class Song {
 export function getSongUrl() {
   const url = "https://c.y.qq.com/v8/fcg-bin/v8.fcg";
   const data = Object.assign({}, songUrlParams, songUrlData);
-  console.log(data);
   return jsonp(url, data, options);
 }
 

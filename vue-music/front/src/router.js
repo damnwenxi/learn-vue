@@ -1,48 +1,51 @@
-import Vue from 'vue'
-import Router from 'vue-router'
-import rank from './views/rank'
-import recommend from './views/recommend'
-import singer from './views/singer'
-import search from './views/search'
-import singerDetail from './views/singerDetail'
+import Vue from "vue";
+import Router from "vue-router";
+import rank from "./views/rank";
+import recommend from "./views/recommend";
+import singer from "./views/singer";
+import search from "./views/search";
+import singerDetail from "./views/singerDetail";
+import playlistDetail from "./views/playlistDetail";
 
-
-
-Vue.use(Router)
+Vue.use(Router);
 
 export default new Router({
-  mode: 'history',
+  mode: "history",
   base: process.env.BASE_URL,
   routes: [
     {
-      path: '/',
-      redirect: '/recommend'
+      path: "/",
+      redirect: "/recommend"
     },
     {
-      path: '/recommend',
-      name: 'recommend',
+      path: "/recommend",
+      name: "recommend",
       component: recommend
     },
     {
-      path: '/singer',
-      name: 'singer',
+      path: "/singer",
+      name: "singer",
       component: singer
       // lazy load router
       // component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
     },
     {
-      path: '/singer/:id',
+      path: "/singer/:id",
       component: singerDetail
     },
     {
-      path: '/search',
-      name: 'search',
+      path: "/playlist/:id",
+      component: playlistDetail
+    },
+    {
+      path: "/search",
+      name: "search",
       component: search
     },
     {
-      path: '/rank',
-      name: 'rank',
+      path: "/rank",
+      name: "rank",
       component: rank
     }
   ]
-})
+});

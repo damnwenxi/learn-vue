@@ -1,38 +1,48 @@
-import jsonp from './jsonp'
-import { commonParams, options } from './config'
-import axios from 'axios'
+import jsonp from "./jsonp";
+import { commonParams, options, PURL_SERVER } from "./config";
 
 export function getRecommend() {
-    const url = 'https://c.y.qq.com/musichall/fcgi-bin/fcg_yqqhomepagerecommend.fcg'
+  const url =
+    "https://c.y.qq.com/musichall/fcgi-bin/fcg_yqqhomepagerecommend.fcg";
 
-    const data = {
-        ...commonParams,
-        platform: 'h5',
-        uin: 0,
-        needNewCode: 1,
-    }
+  const data = {
+    ...commonParams,
+    platform: "h5",
+    uin: 0,
+    needNewCode: 1
+  };
 
-    return jsonp(url, data, options)
+  return jsonp(url, data, options);
 }
 
 export function getDiscList() {
-    const url = '/api/getDiscList'
+  let promise = new Promise((resolve, reject) => {
+    fetch(PURL_SERVER + "/playlist")
+      .then(body => {
+        return body.json();
+      })
+      .then(res => {
+        resolve(res);
+      })
+      .catch(e => {
+        reject(e);
+      });
+  });
+  return promise;
+}
 
-    const data = Object.assign({}, commonParams, {
-        platform: 'yqq',
-        hostUin: 0,
-        sin: 0,
-        ein: 29,
-        sortId: 5,
-        needNewCode: 0,
-        categoryId: 10000000,
-        rnd: Math.random(),
-        format: 'json'
-    })
-
-    return axios.get(url, {
-        params: data
-    }).then((res) => {
-        return Promise.resolve(res.data)
-    })
+export function getDiscDetail(id) {
+  let promise = new Promise((resolve, reject) => {
+    fetch(PURL_SERVER + "/cddetail?id=" + id)
+      .then(body => {
+        return body.json();
+      })
+      .then(res => {
+        resolve(res);
+      })
+      .catch(e => {
+        reject(e);
+      });
+  });
+  return promise;
 }

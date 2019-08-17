@@ -1,13 +1,13 @@
 <template>
   <transition name="slide">
     <div class="singer-detail">
-      <music-list :bgimg="singer.avatar" :songs="songs" :title="singer.name"></music-list>
+      <music-list :bgimg="discImg" :desc="desc" :songs="songs" :title="title"></music-list>
     </div>
   </transition>
 </template>
 
 <script>
-import { getSingerDetail } from '../api/singer'
+import { getDiscDetail } from '../api/recommend'
 import { mapGetters } from 'vuex'
 import { createSong } from '../api/song'
 import musicList from '../components/part/music-list'
@@ -18,23 +18,31 @@ export default {
     },
     data() {
         return {
-            songs: []
+            songs: [],
+            discImg: '',
+            title: '',
+            desc: ''
         }
     },
     created() {
-        this._getDetail()
+        this._getDiscDetail()
     },
     methods: {
-        _getDetail() {
-            if (!this.singer.id) {
+        _getDiscDetail() {
+            if (!this.$route.params.id) {
                 this.$router.push({
-                    path: '/singer'
+                    path: '/recommend'
                 })
                 return
             }
-            getSingerDetail(this.singer.id)
+            const tid = this.$route.params.id
+            getDiscDetail(tid)
                 .then(res => {
-                    this.songs = this._normallizeSongs(res.data.list)
+                    let cd = res.cdlist[0]
+                    this.songs = this._normallizeSongs(cd.songlist)
+                    this.title = cd.dissname
+                    this.desc = cd.desc
+                    this.discImg = cd.dir_pic_url2
                 })
                 .catch(e => {
                     throw e
@@ -43,16 +51,25 @@ export default {
         _normallizeSongs(list) {
             let ret = []
             list.forEach(item => {
-                let musicData = item.musicData
-                if (musicData.songid && musicData.albummid) {
-                    ret.push(createSong(musicData))
+                let musicData = {
+                    albumname: item.album.name,
+                    songid: item.id,
+                    songmid: item.mid,
+                    pay: {
+                        payplay: item.pay.pay_play
+                    },
+                    singer: item.singer,
+                    songname: item.name,
+                    interval: item.interval,
+                    albummid: item.album.mid
                 }
+                ret.push(createSong(musicData))
             })
             return ret
         }
     },
     computed: {
-        ...mapGetters(['singer'])
+        ...mapGetters(['playlist'])
     }
 }
 </script>
