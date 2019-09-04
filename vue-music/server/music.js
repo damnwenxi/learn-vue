@@ -1,11 +1,8 @@
 const Koa = require("koa");
 const Router = require("koa-router");
 const rp = require("request-promise");
-const db = require("./db");
 const app = new Koa();
 const router = new Router();
-
-app.context.db = db.news;
 
 app.use(async (ctx, next) => {
   ctx.set("Access-Control-Allow-Headers", "*");
@@ -127,6 +124,42 @@ router.get("/cddetail", async ctx => {
       .then(res => {
         if (res.code === 0) {
           ctx.body = { code: res.code, cdlist: res.cdlist };
+        } else {
+          ctx.body = { code: res.code };
+        }
+      })
+      .catch(e => {
+        console.log(e);
+      });
+  } catch (e) {
+    ctx.body = {
+      msg: "error"
+    };
+  }
+});
+
+// 获取排行榜接口
+router.get("/rank", async ctx => {
+  try {
+    let params = { "req_0": { "module": "musicToplist.ToplistInfoServer", "method": "GetAll", "param": {} }, "comm": { "g_tk": 5381, "uin": 0, "format": "json", "ct": 23, "cv": 0 } }
+    var options = {
+      method: 'POST',
+      uri: 'https://u.y.qq.com/cgi-bin/musicu.fcg',
+      qs: {
+        _:Date.now()
+      },
+      headers: {
+        "User-Agent": "Request-Promise",
+        'Content-Type': 'application/json'
+      },
+      body:params,
+      json: true // Automatically parses the JSON string in the response
+    };
+
+    await rp(options)
+      .then(res => {
+        if (res.code === 0) {
+          ctx.body = { code: res.code, rankList: res.req_0.data.group };
         } else {
           ctx.body = { code: res.code };
         }

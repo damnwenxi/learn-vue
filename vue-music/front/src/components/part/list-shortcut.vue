@@ -30,7 +30,7 @@ export default {
   border-radius: 15px;
   .list-item {
     display: block;
-    padding-top: 5px;
+    padding-top: 0;
     width: 30px;
     &:hover {
       color: $theme-color;

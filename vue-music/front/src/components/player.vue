@@ -218,11 +218,6 @@ export default {
     handleProgressChange (progress) {
       let current = progress * this.$refs.audio.duration
       this.$refs.audio.currentTime = current
-      let minute = parseInt(current / 60)
-      let second = parseInt(current) % 60
-      let msec = current.toString().split('.')[1].slice(0, 2)
-      let seekNum = '0' + minute + ':' + second + '.' + msec
-      this.currentLyric.seek('02:23.34')
     },
     // canplay
     canPlay (e) {
@@ -340,9 +335,6 @@ export default {
           // this.currentLyric.stop()
         }
       })
-    },
-    currentLyricLine (val) {
-      console.log(val)
     }
   }
 }
