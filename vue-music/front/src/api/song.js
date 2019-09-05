@@ -3,25 +3,26 @@ import { songUrlParams, options, songUrlData, PURL_SERVER } from "./config";
 import { Base64 } from "js-base64";
 
 export default class Song {
-  constructor({ ispay, id, mid, singer, name, album, duration, image, url }) {
-    this.ispay = ispay;
-    this.id = id;
-    this.mid = mid;
-    this.singer = singer;
-    this.name = name;
-    this.album = album;
-    this.duration = duration;
-    this.image = image;
-    this.url = url;
+  constructor({ ispay, id, mid, singer, name, album, duration, image, url, albummid }) {
+    this.ispay = ispay || 0;
+    this.id = id || 0;
+    this.mid = mid || 0;
+    this.singer = singer || '';
+    this.name = name || '';
+    this.album = album || '';
+    this.duration = duration || '';
+    this.image = image || '';
+    this.url = url || '';
+    this.albummid = albummid;
   }
 
-  getLyric() {
+  getLyric(mid) {
     if (this.lyric) {
       return new Promise.resolve(this.lyric);
     }
 
     const promise = new Promise((resolve, reject) => {
-      fetch(PURL_SERVER + "/musicLyric?id=" + this.mid)
+      fetch(PURL_SERVER + "/musicLyric?id=" + mid)
         .then(body => {
           return body.json();
         })
@@ -61,24 +62,44 @@ export function getPlayUrl(mid) {
 
 export function createSong(musicData) {
   return new Song({
-    ispay: musicData.pay.payplay,
+    ispay: musicData.pay ? musicData.pay.payplay: '',
     id: musicData.songid,
     mid: musicData.songmid,
     singer: filterSinger(musicData.singer),
-    name: musicData.songname,
-    album: musicData.albumname,
-    duration: musicData.interval,
+    name: musicData.songname || '',
+    album: musicData.albumname || '',
+    duration: musicData.interval || '',
+    albummid: musicData.albummid || '',
     image: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${
       musicData.albummid
-    }.jpg?max_age=2592000`,
+    }.jpg?max_age=2592000` || '',
     url: `https://api.bzqll.com/music/tencent/url?id=${
       musicData.mid
-    }&key=579621905&br=320`
+    }&key=579621905&br=320` || ''
   });
+}
+
+export function getSongMid(albumid) {
+  const promise = new Promise((resolve, reject) => {
+    fetch(PURL_SERVER + '/getSongMid?id=' + albumid)
+      .then(body => {
+        return body.json();
+      })
+      .then(res => {
+        resolve(res);
+      })
+      .catch(e => {
+        reject(e);
+      });
+  });
+  return promise;
 }
 
 function filterSinger(singer) {
   let ret = [];
+  if(Object.prototype.toString.call(singer) != '[object Array]' ){
+    return singer
+  }
   if (!singer) {
     return "";
   }

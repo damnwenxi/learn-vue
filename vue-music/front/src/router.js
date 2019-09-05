@@ -6,6 +6,7 @@ import singer from "./views/singer";
 import search from "./views/search";
 import singerDetail from "./views/singerDetail";
 import playlistDetail from "./views/playlistDetail";
+import rankDetail from './views/rankDetail';
 
 Vue.use(Router);
 
@@ -46,6 +47,10 @@ export default new Router({
       path: "/rank",
       name: "rank",
       component: rank
-    }
+    },
+    {
+      path: "/rank/:id",
+      component: rankDetail
+    },
   ]
 });

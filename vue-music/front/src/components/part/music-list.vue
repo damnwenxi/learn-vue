@@ -84,6 +84,11 @@ export default {
                     path: '/'
                 })
             }
+            if (/.*rank*/.test(currentPath)) {
+                this.$router.push({
+                    path: '/rank'
+                })
+            }
         },
         handleScroll() {
             this.isScrollTop = true

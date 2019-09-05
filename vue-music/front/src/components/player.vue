@@ -119,7 +119,7 @@
 
 <script>
 import { mapGetters, mapMutations } from 'vuex'
-import { getPlayUrl } from '../api/song'
+import { getPlayUrl, getSongMid } from '../api/song'
 import progressBar from './part/progress-bar'
 import loading from './part/loading'
 import { shaffle } from '../api/util'
@@ -270,20 +270,42 @@ export default {
 
     // 获取播放链接
     _getPlayUrl () {
-      const mid = this.currentSong.mid
-      getPlayUrl(mid).then(res => {
-        this.playUrl = res.sip[0] + res.midurlinfo.purl
-      })
-      this.currentSong
-        .getLyric()
-        .then(lyric => {
-          this.currentLyricLine = 0
-          this.currentLyric = new Lyric(lyric, this.lyricHandle)
+      let mid = this.currentSong.mid
+      if(!mid){
+        getSongMid(this.currentSong.albummid).then(res=>{
+          let songs = res.data.list
+          mid = songs.filter(song=>{
+            return song.songid = this.currentSong.id
+          })[0].songmid
+          getPlayUrl(mid).then(res => {
+            this.playUrl = res.sip[0] + res.midurlinfo.purl
+          })
+          this.currentSong
+            .getLyric(mid)
+            .then(lyric => {
+              this.currentLyricLine = 0
+              this.currentLyric = new Lyric(lyric, this.lyricHandle)
+            })
+            .catch(() => {
+              this.currentLyric.stop()
+              this.currentLyric = null
+            })
         })
-        .catch(() => {
-          this.currentLyric.stop()
-          this.currentLyric = null
+      }else{
+        getPlayUrl(mid).then(res => {
+          this.playUrl = res.sip[0] + res.midurlinfo.purl
         })
+        this.currentSong
+          .getLyric(mid)
+          .then(lyric => {
+            this.currentLyricLine = 0
+            this.currentLyric = new Lyric(lyric, this.lyricHandle)
+          })
+          .catch(() => {
+            this.currentLyric.stop()
+            this.currentLyric = null
+          })
+      }
     },
     // 歌词回调
     lyricHandle ({ lineNum }) {
@@ -313,6 +335,7 @@ export default {
   },
   watch: {
     currentSong (newSong, oldSong) {
+      console.log(newSong)
       if (newSong.id === oldSong.id) {
         return
       }
