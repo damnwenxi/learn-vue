@@ -73,6 +73,7 @@ router.get("/musicLyric", async ctx => {
   }
 });
 
+// 获取播放列表
 router.get("/playlist", async ctx => {
   try {
     const preurl =
@@ -173,6 +174,78 @@ router.get("/rank", async ctx => {
     };
   }
 });
+
+// 获取排行榜播放列表
+router.get('/rankDetail', async ctx=>{
+  try {
+    const id = ctx.query.id.toString();
+    let data = `{ "detail": { "module": "musicToplist.ToplistInfoServer", "method": "GetDetail", "param": { "topId": ${id}, "offset": 0, "num": 20, "period": "2019-09-05" } }, "comm": { "ct": 24, "cv": 0 } }`
+    const preurl =
+      "https://u.y.qq.com/cgi-bin/musicu.fcg?-=getUCGI9405228009692879&g_tk=5381&loginUin=0&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0";
+
+    var options = {
+      uri: preurl,
+      qs: {
+        data: data
+      },
+      headers: {
+        "User-Agent": "Request-Promise"
+      },
+      json: true // Automatically parses the JSON string in the response
+    };
+
+    await rp(options)
+      .then(res => {
+        if (res.code === 0) {
+          console.log(res)
+          ctx.body = { code: res.code, detail:res.detail };
+        } else {
+          ctx.body = { code: res.code };
+        }
+      })
+      .catch(e => {
+        console.log(e);
+      });
+  } catch (e) {
+    ctx.body = {
+      msg: "error"
+    };
+  }
+})
+
+// 获取歌曲mid
+router.get('/getSongMid', async ctx=>{
+  try {
+    let id = ctx.request.query.id.toString()
+    let preurl = 'https://c.y.qq.com/v8/fcg-bin/fcg_v8_album_info_cp.fcg?ct=24&g_tk=5381&loginUin=1396956549&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0'
+    
+    var options = {
+      uri: preurl,
+      qs: {
+        albummid: id
+      },
+      headers: {
+        "User-Agent": "Request-Promise"
+      },
+      json: true // Automatically parses the JSON string in the response
+    };
+
+    await rp(options)
+      .then(res => {
+        if (res.code === 0) {
+          ctx.body = { code: res.code, data: res.data };
+        } else {
+          ctx.body = { code: res.code };
+        }
+      })
+      .catch(e => {
+        console.log(e);
+      });
+  
+  } catch (e) {
+    console.log(e)
+  }
+})
 
 app.use(router.routes()).use(router.allowedMethods());
 app.listen(9999, () => {
