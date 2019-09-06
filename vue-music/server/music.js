@@ -247,6 +247,73 @@ router.get('/getSongMid', async ctx=>{
   }
 })
 
+
+// 关键字搜索
+router.get('/search', async ctx => {
+  try {
+    let key = ctx.request.query.w.toString()
+    let preurl = 'https://c.y.qq.com/soso/fcgi-bin/client_search_cp?ct=24&qqmusic_ver=1298&new_json=1&remoteplace=txt.yqq.center&searchid=53963511043613753&t=0&aggr=1&cr=1&catZhida=1&lossless=0&flag_qc=0&p=1&n=10&g_tk=5381&loginUin=1396956549&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0'
+
+    var options = {
+      uri: preurl,
+      qs: {
+        w: key
+      },
+      headers: {
+        "User-Agent": "Request-Promise"
+      },
+      json: true // Automatically parses the JSON string in the response
+    };
+
+    await rp(options)
+      .then(res => {
+        if (res.code === 0) {
+          ctx.body = res;
+        } else {
+          ctx.body = { code: res.code };
+        }
+      })
+      .catch(e => {
+        console.log(e);
+      });
+
+  } catch (e) {
+    console.log(e)
+  }
+})
+
+
+// 热词推荐
+router.get('/hotkey', async ctx => {
+  try {
+    let preurl = 'https://c.y.qq.com/splcloud/fcgi-bin/gethotkey.fcg?g_tk=5381&loginUin=1396956549&hostUin=0&format=json&inCharset=utf8&outCharset=utf-8&notice=0&platform=yqq.json&needNewCode=0'
+
+    var options = {
+      uri: preurl,
+      headers: {
+        "User-Agent": "Request-Promise"
+      },
+      json: true // Automatically parses the JSON string in the response
+    };
+
+    await rp(options)
+      .then(res => {
+        if (res.code === 0) {
+          ctx.body = res;
+        } else {
+          ctx.body = { code: res.code };
+        }
+      })
+      .catch(e => {
+        console.log(e);
+      });
+
+  } catch (e) {
+    console.log(e)
+  }
+})
+
+
 app.use(router.routes()).use(router.allowedMethods());
 app.listen(9999, () => {
   console.log("app id running on port 9999");
