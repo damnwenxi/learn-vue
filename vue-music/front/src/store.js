@@ -30,6 +30,7 @@ export default new Vuex.Store({
     sequenceList: [],
     mode: playMode.sequence,
     currentIndex: -1,
+    currentSong: ''
   },
   mutations: {
     setSinger(state, singer) {
@@ -52,6 +53,9 @@ export default new Vuex.Store({
     },
     setCurrentIndex(state, index) {
       state.currentIndex = index
+    },
+    setCurrentSong(state,song){
+      state.currentSong = song
     }
   },
   actions: {
@@ -98,7 +102,7 @@ export default new Vuex.Store({
       return state.currentIndex
     },
     currentSong: (state) => {
-      return state.playlist[state.currentIndex] || {}
+      return state.currentSong || state.playlist[state.currentIndex] || {}
     }
   }
 })

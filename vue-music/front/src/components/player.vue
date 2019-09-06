@@ -231,14 +231,19 @@ export default {
     },
     // 切歌
     switchSong (n) {
-      this.currentLyric.stop()
+      if(this.currentLyric){
+        this.currentLyric.stop()
+      }
+      this.currentLyric = null
       this.isRotate = 'rotate pause'
       this.setPlayingState(false)
+      this.setCurrentSong('')
       const len = this.playlist.length
       // the playing mode is loop
       if (this.mode === 1) {
         this.$refs.audio.currentTime = 0
       } else {
+        // debugger
         this.setCurrentIndex(this.currentIndex + n)
         if (this.currentIndex < 0 || this.currentIndex > len - 1) {
           this.setCurrentIndex(0)
@@ -265,7 +270,8 @@ export default {
       'setPlayingState',
       'setCurrentIndex',
       'setMode',
-      'setPlayList'
+      'setPlayList',
+      'setCurrentSong'
     ]),
 
     // 获取播放链接
@@ -335,13 +341,17 @@ export default {
   },
   watch: {
     currentSong (newSong, oldSong) {
-      console.log(newSong)
+      // console.log(newSong)
       if (newSong.id === oldSong.id) {
         return
       }
       if (newSong.ispay) {
         // console.log('付费歌曲，已为您切换到下一首')
         this.switchSong(1)
+      }
+      if(this.currentLyric){
+        this.currentLyric.stop()
+        this.currentLyric = null
       }
       this._getPlayUrl()
     },

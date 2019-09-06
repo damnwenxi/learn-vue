@@ -1,5 +1,6 @@
 <template>
   <div class="singer-list">
+      <loading v-show="!singerGroup"/>
     <ul>
       <li :key="singers.title" class="list-group" v-for="singers in singerGroup">
         <h1 :id="singers.title" class="list-group-title">{{singers.title}}</h1>
@@ -28,10 +29,12 @@ import { getSingerList } from '../../api/singer'
 import { ERR_OK } from '../../api/config'
 import Signer from '../../api/singer'
 import shortList from './list-shortcut'
+import loading from '../part/loading'
+
 const HOT_NAME = '热门'
 const HOT_NUM = 10
 export default {
-    components: { shortList },
+    components: { shortList, loading },
     data() {
         return {
             singerGroup: [],

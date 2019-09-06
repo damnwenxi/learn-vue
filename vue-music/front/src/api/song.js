@@ -17,9 +17,9 @@ export default class Song {
   }
 
   getLyric(mid) {
-    if (this.lyric) {
-      return new Promise.resolve(this.lyric);
-    }
+    // if (this.lyric) {
+    //   return new Promise.resolve(this.lyric);
+    // }
 
     const promise = new Promise((resolve, reject) => {
       fetch(PURL_SERVER + "/musicLyric?id=" + mid)

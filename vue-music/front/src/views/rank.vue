@@ -1,8 +1,9 @@
 <template>
   <div class="rank">
+    <loading v-show="!list"/>
     <ul class="rank-wrap">
       <li @click="selectRank(item.topId)" class="rank-item" v-for="(item, index) in list" :key="index">
-        <img class="cover" :src="item.headPicUrl">
+        <img class="cover" v-lazy="item.headPicUrl">
         <div class="rank-info">
           <p class="title line-limit-length">{{item.title}}</p>
           <p class="song line-limit-length">{{item.song[0].title}} <span>-{{item.song[0].singerName}}</span> </p>
@@ -16,9 +17,11 @@
 
 <script>
 import {PURL_SERVER} from '../api/config'
+import loading from '../components/part/loading'
 
 export default {
   name: "rank",
+  components:{loading},
   data () {
     return {
       list:''
@@ -32,7 +35,6 @@ export default {
         rankList = rankList.concat(ele.toplist)
       });
       this.list = rankList
-      console.log(this.list);
     }).catch(e=>{
       console.log(e)
     })
@@ -49,6 +51,7 @@ export default {
 
 <style lang="scss" scoped>
 .rank{
+    min-height: 100%;
     background-color: rgba(255, 255, 255, .1);
     padding: 10px;
   .rank-wrap{

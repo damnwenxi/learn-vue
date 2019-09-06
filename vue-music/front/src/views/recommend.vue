@@ -8,7 +8,7 @@
       <ul>
         <li :key="index" @click="goToPlaylist(item.tid)" class="item" v-for="(item,index) in items">
           <div class="icon">
-            <img :src="item.cover_url_small" height="60" width="60" />
+            <img v-lazy="item.cover_url_small" height="60" width="60" />
           </div>
           <div class="desc">
             <h2>{{item.title}}</h2>
