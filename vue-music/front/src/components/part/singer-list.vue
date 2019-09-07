@@ -1,6 +1,6 @@
 <template>
   <div class="singer-list">
-      <loading v-show="!singerGroup"/>
+    <loading v-show="!singerGroup"/>
     <ul>
       <li :key="singers.title" class="list-group" v-for="singers in singerGroup">
         <h1 :id="singers.title" class="list-group-title">{{singers.title}}</h1>
@@ -153,14 +153,21 @@ export default {
 }
 
 .singer-list {
-    height: 100%;
-    .list-shortcut {
-        position: fixed;
-        right: 0;
-        top: 105px;
+    position: absolute;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    ul{
+        padding-bottom: 60px;
     }
-    height: 100%;
-    overflow-y: scroll;
+    .list-shortcut {
+        max-width: 30px;
+        position: fixed;
+        top: 120px;
+        bottom: 76px;
+        right: 0;
+        margin: auto;
+    }
 }
 </style>
 

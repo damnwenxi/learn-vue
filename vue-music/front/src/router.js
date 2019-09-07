@@ -11,8 +11,7 @@ import rankDetail from './views/rankDetail';
 Vue.use(Router);
 
 export default new Router({
-  mode: "history",
-  base: process.env.BASE_URL,
+  mode: "hash",
   routes: [
     {
       path: "/",

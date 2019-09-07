@@ -111,6 +111,7 @@ export default {
 
 <style lang="scss" scoped>
 .search{
+  font-size: 0.9em;
   div{
     width: 100%;
     flex-shrink: 0;
@@ -128,6 +129,7 @@ export default {
     .txt-input{
       background: transparent;
       border: none;
+      font-size: 0.9em;
       padding-left: 2em;
       line-height: 40px;
       flex-grow: 1;
@@ -141,12 +143,15 @@ export default {
       line-height: 40px;
       border: none;
       color: #fff;
+      .iconfont{
+        font-size: 1.4em;
+      }
     }
   }
 
   .hot-box{
     .hot-title{
-      font-size: 12px;
+      font-size: 0.9em;
       line-height: 30px;
       text-align: left;
       padding-left: 1em;
@@ -160,7 +165,7 @@ export default {
       .hot-item{
         padding: 0 10px;
         background: rgba(255,255,255,.1);
-        font-size: 12px;
+        font-size: 0.9em;
         border-radius: 4px;
         margin:5px 10px;
         margin-left: 0;

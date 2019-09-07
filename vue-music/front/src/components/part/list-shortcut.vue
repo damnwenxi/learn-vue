@@ -1,13 +1,11 @@
 <template>
   <div class="shortcut">
-    <ul>
       <a
         :href="'#'+shortcut"
         class="list-item"
         v-for="shortcut in shortCutList"
         :key="shortcut"
       >{{shortcut}}</a>
-    </ul>
   </div>
 </template>
 
@@ -24,14 +22,18 @@ export default {
 <style lang="scss" scoped>
 @import "../../assets/css/base.scss";
 .shortcut {
-  padding: 5px 0;
-  width: 30px;
-  font-size: 14px;
+  height: 100%;
+  font-size: 1em;
   border-radius: 15px;
+  padding: 0 3px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  overflow: hidden;
   .list-item {
+    flex-shrink: 1;
     display: block;
-    padding-top: 0;
-    width: 30px;
     &:hover {
       color: $theme-color;
       cursor: pointer;
